@@ -28,29 +28,57 @@
 	/* margin-top: 1rem; */
 }
 
-.calculatorBtn {
-	background-color: #dee2e3;
+.numberBtn,
+.operationBtn,
+.equalsBtn,
+.dotBtn {
+	/* background-color: #dee2e3; */
+
 	color: #252525;
 	border: 0;
 	border-radius: 3rem;
 	padding: 1.5rem;
-	font-size: 1.25rem;
+	font-size: 1.75rem;
 	font-weight: 700;
 	box-shadow: 0 2px 8px 0 #252525;
 	min-width: 3rem;
 	width: 100%;
 }
 
-.calculatorBtn:hover {
+.numberBtn,
+.dotBtn {
+	background: rgb(231, 233, 233);
+	background: linear-gradient(
+		0deg,
+		rgba(231, 233, 233, 1) 0%,
+		rgba(198, 210, 211, 1) 75%
+	);
+}
+
+.operationBtn {
+	background: rgb(201, 217, 218);
+	background: linear-gradient(
+		0deg,
+		rgba(201, 217, 218, 1) 0%,
+		rgba(147, 171, 173, 1) 50%
+	);
+}
+
+.equalsBtn {
+	background: rgb(239, 219, 148);
+	background: linear-gradient(0deg, rgba(239, 219, 148, 1) 0%, rgba(233, 173, 92, 1) 75%);
+}
+
+.numberBtn:hover {
 	background-color: #a1a3a3;
 }
 
-.calculatorBtn:focus {
+.numberBtn:focus {
 	background-color: #a1a3a3;
 	border: 0;
 	box-shadow: 0 2px 8px 0 #252525;
 	outline: 0;
 
-	animation: bounceIn; /* referring directly to the animation's @keyframe declaration */
-	animation-duration: 2s; /* don't forget to set a duration! */
+	/* animation: bounceIn; 
+	animation-duration: 1s; */
 }
