@@ -40,6 +40,17 @@
 	min-width: 3rem;
 	width: 100%;
 }
+
 .calculatorBtn:hover {
 	background-color: #a1a3a3;
+}
+
+.calculatorBtn:focus {
+	background-color: #a1a3a3;
+	border: 0;
+	box-shadow: 0 2px 8px 0 #252525;
+	outline: 0;
+
+	animation: bounceIn; /* referring directly to the animation's @keyframe declaration */
+	animation-duration: 2s; /* don't forget to set a duration! */
 }
