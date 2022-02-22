@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
+import { add, subtract, multiply, divide } from './calc';
+
 import './Calculator.css';
 // @bug every component in Calculator rerenderes
 // 	whenever a number is clicked or a key is pressed
@@ -24,37 +26,137 @@ export const Calculator = () => {
 			});
 		});
 
+		const outputNode = document.querySelector('.output-row .col');
+		const historyNode = outputNode.childNodes[0];
+		const numberNode = outputNode.childNodes[1];
+		let numberValue = 0;
+		let historyValue = 0;
+
+		// @bug gets called multiple times as the state changes
+		// gets called atleast one time for each number on the output screen
 		function appendNumber(n) {
 			console.log(`Number Entered: ${n}`);
+			let historyTxt = historyNode.textContent;
+			if (historyTxt[historyTxt.length - 1] === '=') {
+				console.log('reset everything');
+				historyNode.textContent = 'prev number';
+				numberNode.textContent = n;
+				return;
+			}
+			// selects output screen
+			let currN = numberNode.textContent;
+
+			if (n === '.' && currN.includes('.')) {
+				console.log('number already has DOT ( . )');
+				return;
+			}
 			// selects related dom element
 			// const node = document.querySelector(`button[value="${n}"]`);
-			let _n1 = n1 === 'Hello' ? '' : n1;
-			console.log(n1);
-			console.log(_n1);
-			console.log(n);
-			console.log(_n1 + '' + n);
-			_n1 = _n1 + '' + n;
-			console.log(_n1);
+			let outNumber = currN === 'Hello' || currN === '0' ? '' : currN;
+			// console.log(n1);
+			// console.log(outNumber);
+			// console.log(n);
+			// console.log(outNumber + '' + n);
+			// console.log(outNumber);
+			outNumber = outNumber + '' + n;
+			console.log(`outNumber: ${outNumber}`);
+			numberNode.textContent = outNumber;
+			numberValue = parseFloat(outNumber);
 			// @bug n1 is always 'Hello'
-			setN1(_n1);
+			// @bug n1 =  state(0) => state(1) => state(2) => state(1 + 2)
+			// setN1(outNumber);
 		}
 
 		function enterPressed() {
 			console.log(`enterPressed`);
+			const op = historyNode.textContent.split(' ')[1];
+			historyNode.textContent += `${parseFloat(numberNode.textContent)} =`;
+			let res = 0;
+
+			switch (op) {
+				case '+':
+					console.log('addFunction(a, b)');
+					res = add(historyValue, numberValue);
+					break;
+				case '-':
+					console.log('subtractFunction(a, b)');
+					res = subtract(historyValue, numberValue);
+					break;
+				case '*':
+					console.log('multiplyFunction(a, b)');
+					res = multiply(historyValue, numberValue);
+					break;
+				case '/':
+					console.log('divisionFunction(a, b)');
+					res = divide(historyValue, numberValue);
+					break;
+				default:
+					break;
+			}
+			console.log('numberValue');
+			console.log(numberValue);
+			console.log('historyValue');
+			console.log(historyValue);
+			numberNode.textContent = res;
+		}
+
+		function operationPressed(op) {
+			console.log(`operationPressed`);
+			console.log(op);
+			historyValue = parseFloat(numberNode.textContent);
+			/* historyNode.textContent += `${parseFloat(numberNode.textContent)} ${op} `; */
+			appendHistoryNode(op);
+			numberNode.textContent = '0'; // @bug if '' p element disappears until N is added
+			switch (op) {
+				case '+':
+					console.log('addFunction(a, b)');
+					add(1, 2);
+					break;
+				case '-':
+					console.log('subtractFunction(a, b)');
+					subtract(1, 2);
+					break;
+				case '*':
+					console.log('multiplyFunction(a, b)');
+					multiply(1, 2);
+					break;
+				case '/':
+					console.log('divisionFunction(a, b)');
+					divide(1, 2);
+					break;
+				default:
+					break;
+			}
+		}
+
+		function appendHistoryNode(op) {
+			if (historyNode.textContent === 'prev number') {
+				historyNode.textContent = `${parseFloat(
+					numberNode.textContent
+				)} ${op} `;
+			} else
+				historyNode.textContent += `${parseFloat(
+					numberNode.textContent
+				)} ${op} `;
 		}
 
 		function keyPressed(ev) {
+			const operations = ['+', '-', '*', '/'];
 			console.log(`keyPressed`);
 			console.log(ev.key);
-			if (!isNaN(ev.key) && ev.key !== ' ') appendNumber(ev.key);
-			if (ev.key === 'Enter') enterPressed();
+			if ((!isNaN(ev.key) && ev.key !== ' ') || ev.key === '.')
+				appendNumber(ev.key);
+			else if (ev.key === 'Enter') enterPressed();
+			else if (operations.includes(ev.key)) operationPressed(ev.key);
 		}
 
 		// handles when user press Numpad or Digits (0-9)
+		// @bug adds eventListener on every render
 		window.addEventListener('keydown', keyPressed);
 
 		const numberBtns = Array.from(document.querySelectorAll('.numberBtn'));
 		numberBtns.forEach((btn) => {
+			// @bug adds eventListener on every render
 			btn.addEventListener('click', (ev) => {
 				console.log(`numberBtn Clicked: ${ev.target.value}`);
 				appendNumber(ev.target.value);
@@ -65,7 +167,7 @@ export const Calculator = () => {
 				setN1(_n1 + '' + ev.target.value); */
 			});
 		});
-	}, []);
+	});
 
 	return (
 		<Container className="calculator">
@@ -74,7 +176,7 @@ export const Calculator = () => {
 					<p>
 						<small>prev number</small>
 					</p>
-					{n1}
+					<p>{n1}</p>
 				</Col>
 			</Row>
 			<Row className="operations-row">{row0}</Row>

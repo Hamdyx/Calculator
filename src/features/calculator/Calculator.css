@@ -27,7 +27,8 @@
 }
 
 .operations-row > .col-md-6 {
-	flex: 2.468;
+	/* flex: 2.468; */
+	flex: 2.156;
 }
 
 .numberBtn,
@@ -102,6 +103,10 @@
 		padding: 0.25rem 0;
 	}
 
+	.operations-row > .col-md-6 {
+		flex: 2.468;
+	}
+
 	.numberBtn,
 	.operationBtn,
 	.equalsBtn,
@@ -121,6 +126,10 @@
 	.output-row {
 		font-size: 0.75rem;
 		padding: 0.25rem 0;
+	}
+
+	.operations-row > .col-md-6 {
+		flex: 2.905;
 	}
 
 	.numberBtn,
