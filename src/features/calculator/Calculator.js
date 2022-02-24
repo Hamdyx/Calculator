@@ -1,13 +1,14 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
-import { add, subtract, multiply, divide } from './calc';
+import Calc from './calc';
 
 import './Calculator.css';
 // @bug every component in Calculator rerenderes
 // 	whenever a number is clicked or a key is pressed
 export const Calculator = () => {
-	const [n1, setN1] = useState('Hello');
+	/* const [n1, setN1] = useState('Hello'); */
+	const Calcx = new Calc();
 
 	const row0 = ['C', '%', 'x', '/'].map((el) => (
 		<CalculatorBtn key={el} val={el} />
@@ -32,15 +33,22 @@ export const Calculator = () => {
 		let numberValue = 0;
 		let historyValue = 0;
 
+		function resetCalc() {
+			console.log('reset everything');
+			historyNode.textContent = 'prev number';
+			numberNode.textContent = 'Hello';
+		}
+
 		// @bug gets called multiple times as the state changes
 		// gets called atleast one time for each number on the output screen
 		function appendNumber(n) {
 			console.log(`Number Entered: ${n}`);
 			let historyTxt = historyNode.textContent;
-			if (historyTxt[historyTxt.length - 1] === '=') {
+			if (historyTxt[historyTxt.length - 2] === '=') {
 				console.log('reset everything');
 				historyNode.textContent = 'prev number';
 				numberNode.textContent = n;
+				/* resetCalc(); */
 				return;
 			}
 			// selects output screen
@@ -53,15 +61,12 @@ export const Calculator = () => {
 			// selects related dom element
 			// const node = document.querySelector(`button[value="${n}"]`);
 			let outNumber = currN === 'Hello' || currN === '0' ? '' : currN;
-			// console.log(n1);
-			// console.log(outNumber);
-			// console.log(n);
-			// console.log(outNumber + '' + n);
-			// console.log(outNumber);
 			outNumber = outNumber + '' + n;
 			console.log(`outNumber: ${outNumber}`);
 			numberNode.textContent = outNumber;
 			numberValue = parseFloat(outNumber);
+			Calcx.setN1(parseFloat(outNumber));
+
 			// @bug n1 is always 'Hello'
 			// @bug n1 =  state(0) => state(1) => state(2) => state(1 + 2)
 			// setN1(outNumber);
@@ -69,26 +74,30 @@ export const Calculator = () => {
 
 		function enterPressed() {
 			console.log(`enterPressed`);
+			if (historyValue === 0) {
+				historyNode.textContent = `${parseFloat(numberNode.textContent)} = `;
+				return;
+			}
 			const op = historyNode.textContent.split(' ')[1];
-			historyNode.textContent += `${parseFloat(numberNode.textContent)} =`;
+			historyNode.textContent += `${parseFloat(numberNode.textContent)} = `;
 			let res = 0;
 
 			switch (op) {
 				case '+':
 					console.log('addFunction(a, b)');
-					res = add(historyValue, numberValue);
+					res = Calcx.add(historyValue, numberValue);
 					break;
 				case '-':
 					console.log('subtractFunction(a, b)');
-					res = subtract(historyValue, numberValue);
+					res = Calcx.subtract(historyValue, numberValue);
 					break;
 				case '*':
 					console.log('multiplyFunction(a, b)');
-					res = multiply(historyValue, numberValue);
+					res = Calcx.multiply(historyValue, numberValue);
 					break;
 				case '/':
 					console.log('divisionFunction(a, b)');
-					res = divide(historyValue, numberValue);
+					res = Calcx.divide(historyValue, numberValue);
 					break;
 				default:
 					break;
@@ -104,25 +113,27 @@ export const Calculator = () => {
 			console.log(`operationPressed`);
 			console.log(op);
 			historyValue = parseFloat(numberNode.textContent);
+			Calcx.setHistory(parseFloat(numberNode.textContent));
+
 			/* historyNode.textContent += `${parseFloat(numberNode.textContent)} ${op} `; */
 			appendHistoryNode(op);
 			numberNode.textContent = '0'; // @bug if '' p element disappears until N is added
 			switch (op) {
 				case '+':
 					console.log('addFunction(a, b)');
-					add(1, 2);
+					Calcx.add(historyValue, numberValue);
 					break;
 				case '-':
 					console.log('subtractFunction(a, b)');
-					subtract(1, 2);
+					Calcx.subtract(historyValue, numberValue);
 					break;
 				case '*':
 					console.log('multiplyFunction(a, b)');
-					multiply(1, 2);
+					Calcx.multiply(historyValue, numberValue);
 					break;
 				case '/':
 					console.log('divisionFunction(a, b)');
-					divide(1, 2);
+					Calcx.divide(historyValue, numberValue);
 					break;
 				default:
 					break;
@@ -148,6 +159,7 @@ export const Calculator = () => {
 				appendNumber(ev.key);
 			else if (ev.key === 'Enter') enterPressed();
 			else if (operations.includes(ev.key)) operationPressed(ev.key);
+			else if (ev.key === 'c') resetCalc();
 		}
 
 		// handles when user press Numpad or Digits (0-9)
@@ -167,16 +179,20 @@ export const Calculator = () => {
 				setN1(_n1 + '' + ev.target.value); */
 			});
 		});
+
+		const resetBtn = document.querySelector('button[value="C"]');
+		resetBtn.addEventListener('click', (ev) => {
+			resetCalc();
+			ev.target.blur();
+		});
 	});
 
 	return (
 		<Container className="calculator">
 			<Row className="output-row">
 				<Col>
-					<p>
-						<small>prev number</small>
-					</p>
-					<p>{n1}</p>
+					<p>prev number</p>
+					<p>Hello</p>
 				</Col>
 			</Row>
 			<Row className="operations-row">{row0}</Row>
