@@ -4,7 +4,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 import Calc from './calc';
 
 import './Calculator.css';
-// @bug every component in Calculator rerenderes
+// @bug every component in Calculator re-renderes
 // 	whenever a number is clicked or a key is pressed
 export const Calculator = () => {
 	/* const [n1, setN1] = useState('Hello'); */
@@ -19,13 +19,57 @@ export const Calculator = () => {
 	const row4 = ['.', '='].map((el) => <CalculatorBtn key={el} val={el} />);
 
 	useEffect(() => {
-		// console.log(document.querySelectorAll('.calculatorBtn'));
-		const calcBtns = Array.from(document.querySelectorAll('.calculatorBtn'));
-		calcBtns.forEach((btn) => {
-			btn.addEventListener('click', (ev) => {
-				console.log(`Button Clicked: ${ev.target.value}`);
+		// setup numberBtns eventListener
+		const setupEventListener = () => {
+			// handles when user press Numpad or Digits (0-9)
+			function handleKeyInput(ev) {
+				const operations = ['+', '-', '*', '/'];
+				console.log(`handleKeyInput`);
+				console.log(ev.key);
+				if (ev.key !== ' ') {
+					if (!isNaN(ev.key) || ev.key === '.') appendNumber(ev.key);
+					else if (operations.includes(ev.key)) operationPressed(ev.key);
+					else {
+						switch (ev.key) {
+							case 'Enter':
+								enterPressed();
+								break;
+							case 'c':
+								resetCalc();
+								break;
+							case 'Backspace':
+								console.log('deleteLastInput()');
+								break;
+							default:
+								console.log('ignoreKey()');
+								break;
+						}
+					}
+				}
+			}
+			// keypress doesn't wotk with Backspace key
+			// @bug eventListener added on every render
+			document.addEventListener('keydown', handleKeyInput);
+
+			const numberBtns = Array.from(document.querySelectorAll('.numberBtn'));
+			numberBtns.forEach((btn) => {
+				// @bug eventListener added on every render
+				btn.addEventListener('click', (ev) => {
+					console.log(`numberBtn Clicked: ${ev.target.value}`);
+					appendNumber(ev.target.value);
+					// removes focus from clicked element as it causes a bug with the keydown ev
+					// if 'enter' key used while there is a focused element
+					ev.target.blur();
+				});
 			});
-		});
+
+			const resetBtn = document.querySelector('button[value="C"]');
+			resetBtn.addEventListener('click', (ev) => {
+				resetCalc();
+				ev.target.blur();
+			});
+		};
+		setupEventListener();
 
 		const outputNode = document.querySelector('.output-row .col');
 		const historyNode = outputNode.childNodes[0];
@@ -39,16 +83,13 @@ export const Calculator = () => {
 			numberNode.textContent = 'Hello';
 		}
 
-		// @bug gets called multiple times as the state changes
-		// gets called atleast one time for each number on the output screen
 		function appendNumber(n) {
 			console.log(`Number Entered: ${n}`);
 			let historyTxt = historyNode.textContent;
 			if (historyTxt[historyTxt.length - 2] === '=') {
-				console.log('reset everything');
-				historyNode.textContent = 'prev number';
+				resetCalc();
 				numberNode.textContent = n;
-				/* resetCalc(); */
+				numberValue = n;
 				return;
 			}
 			// selects output screen
@@ -66,10 +107,6 @@ export const Calculator = () => {
 			numberNode.textContent = outNumber;
 			numberValue = parseFloat(outNumber);
 			Calcx.setN1(parseFloat(outNumber));
-
-			// @bug n1 is always 'Hello'
-			// @bug n1 =  state(0) => state(1) => state(2) => state(1 + 2)
-			// setN1(outNumber);
 		}
 
 		function enterPressed() {
@@ -117,7 +154,7 @@ export const Calculator = () => {
 
 			/* historyNode.textContent += `${parseFloat(numberNode.textContent)} ${op} `; */
 			appendHistoryNode(op);
-			numberNode.textContent = '0'; // @bug if '' p element disappears until N is added
+			numberNode.textContent = '0'; // @bug if '' <p> disappears until N != ''
 			switch (op) {
 				case '+':
 					console.log('addFunction(a, b)');
@@ -136,6 +173,7 @@ export const Calculator = () => {
 					Calcx.divide(historyValue, numberValue);
 					break;
 				default:
+					console.log('Error: unknown operation');
 					break;
 			}
 		}
@@ -150,41 +188,6 @@ export const Calculator = () => {
 					numberNode.textContent
 				)} ${op} `;
 		}
-
-		function keyPressed(ev) {
-			const operations = ['+', '-', '*', '/'];
-			console.log(`keyPressed`);
-			console.log(ev.key);
-			if ((!isNaN(ev.key) && ev.key !== ' ') || ev.key === '.')
-				appendNumber(ev.key);
-			else if (ev.key === 'Enter') enterPressed();
-			else if (operations.includes(ev.key)) operationPressed(ev.key);
-			else if (ev.key === 'c') resetCalc();
-		}
-
-		// handles when user press Numpad or Digits (0-9)
-		// @bug adds eventListener on every render
-		window.addEventListener('keydown', keyPressed);
-
-		const numberBtns = Array.from(document.querySelectorAll('.numberBtn'));
-		numberBtns.forEach((btn) => {
-			// @bug adds eventListener on every render
-			btn.addEventListener('click', (ev) => {
-				console.log(`numberBtn Clicked: ${ev.target.value}`);
-				appendNumber(ev.target.value);
-				// removes focus from clicked element as it causes a bug with the keydown ev
-				// if 'enter' key used while there is a focused element
-				ev.target.blur();
-				/* let _n1 = n1 === 'Hello' ? '' : n1;
-				setN1(_n1 + '' + ev.target.value); */
-			});
-		});
-
-		const resetBtn = document.querySelector('button[value="C"]');
-		resetBtn.addEventListener('click', (ev) => {
-			resetCalc();
-			ev.target.blur();
-		});
 	});
 
 	return (
