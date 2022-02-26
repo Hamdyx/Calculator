@@ -24,8 +24,6 @@ export const Calculator = () => {
 			// handles when user press Numpad or Digits (0-9)
 			function handleKeyInput(ev) {
 				const operations = ['+', '-', '*', '/'];
-				console.log(`handleKeyInput`);
-				console.log(ev.key);
 				if (ev.key !== ' ') {
 					if (!isNaN(ev.key) || ev.key === '.') appendNumber(ev.key);
 					else if (operations.includes(ev.key)) handleOperation(ev.key);
@@ -103,18 +101,18 @@ export const Calculator = () => {
 			// selects output screen
 			let currN = numberNode.textContent;
 
-			if (n === '.' && currN.includes('.')) {
+			/* if (n === '.' && currN.includes('.')) {
 				console.log('number already has DOT ( . )');
 				return;
-			}
+			} */
 			// selects related dom element
 			// const node = document.querySelector(`button[value="${n}"]`);
 			let outNumber = currN === 'Hello' || currN === '0' ? '' : currN;
 			outNumber = outNumber + '' + n;
-			console.log(`outNumber: ${outNumber}`);
 			numberNode.textContent = outNumber;
 			numberValue = parseFloat(outNumber);
 			Calcx.setN1(parseFloat(outNumber));
+			Calcx.addInput(n);
 		}
 
 		function enterPressed() {
@@ -164,6 +162,7 @@ export const Calculator = () => {
 			console.log(op);
 			historyValue = parseFloat(numberNode.textContent);
 			Calcx.setHistory(parseFloat(numberNode.textContent));
+			Calcx.addInput(op);
 
 			/* historyNode.textContent += `${parseFloat(numberNode.textContent)} ${op} `; */
 			appendHistoryNode(op);
