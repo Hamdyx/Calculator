@@ -28,7 +28,7 @@ export const Calculator = () => {
 				console.log(ev.key);
 				if (ev.key !== ' ') {
 					if (!isNaN(ev.key) || ev.key === '.') appendNumber(ev.key);
-					else if (operations.includes(ev.key)) operationPressed(ev.key);
+					else if (operations.includes(ev.key)) handleOperation(ev.key);
 					else {
 						switch (ev.key) {
 							case 'Enter':
@@ -52,6 +52,10 @@ export const Calculator = () => {
 			document.addEventListener('keydown', handleKeyInput);
 
 			const numberBtns = Array.from(document.querySelectorAll('.numberBtn'));
+			const operationsBtns = Array.from(
+				document.querySelectorAll('.operationBtn')
+			);
+
 			numberBtns.forEach((btn) => {
 				// @bug eventListener added on every render
 				btn.addEventListener('click', (ev) => {
@@ -62,11 +66,15 @@ export const Calculator = () => {
 					ev.target.blur();
 				});
 			});
-
-			const resetBtn = document.querySelector('button[value="C"]');
-			resetBtn.addEventListener('click', (ev) => {
-				resetCalc();
-				ev.target.blur();
+			operationsBtns.forEach((btn) => {
+				btn.addEventListener('click', (ev) => {
+					console.log(`operationsBtns Clicked: ${ev.target.value}`);
+					console.log(ev.target.value);
+					handleOperation(ev.target.value);
+					// remove focus to prevent triggering the event twice
+					// 	when enter key is pressed
+					ev.target.blur();
+				});
 			});
 		};
 		setupEventListener();
@@ -132,11 +140,16 @@ export const Calculator = () => {
 					console.log('multiplyFunction(a, b)');
 					res = Calcx.multiply(historyValue, numberValue);
 					break;
+				case 'X':
+					console.log('multiplyFunction(a, b)');
+					res = Calcx.multiply(historyValue, numberValue);
+					break;
 				case '/':
 					console.log('divisionFunction(a, b)');
 					res = Calcx.divide(historyValue, numberValue);
 					break;
 				default:
+					console.log('undefined operation');
 					break;
 			}
 			console.log('numberValue');
@@ -146,8 +159,8 @@ export const Calculator = () => {
 			numberNode.textContent = res;
 		}
 
-		function operationPressed(op) {
-			console.log(`operationPressed`);
+		function handleOperation(op) {
+			console.log(`handleOperation`);
 			console.log(op);
 			historyValue = parseFloat(numberNode.textContent);
 			Calcx.setHistory(parseFloat(numberNode.textContent));
@@ -168,9 +181,22 @@ export const Calculator = () => {
 					console.log('multiplyFunction(a, b)');
 					Calcx.multiply(historyValue, numberValue);
 					break;
+
+				case 'X':
+					console.log('multiplyFunction(a, b)');
+					Calcx.multiply(historyValue, numberValue);
+					break;
+				case 'C':
+					console.log('reset()');
+					resetCalc();
+					break;
 				case '/':
 					console.log('divisionFunction(a, b)');
 					Calcx.divide(historyValue, numberValue);
+					break;
+				case '%':
+					console.log('percentageFunction(a, b)');
+					/* Calcx.percentage(historyValue, numberValue); */
 					break;
 				default:
 					console.log('Error: unknown operation');
@@ -219,9 +245,9 @@ const CalculatorBtn = ({ val }) => {
 	let _className;
 	if (isNaN(val)) {
 		if (val === '=') {
-			_className = 'equalsBtn';
+			_className = 'operationBtn equalsBtn';
 		} else if (val === '.') {
-			_className = 'dotBtn';
+			_className = 'numberBtn';
 		} else {
 			_className = 'operationBtn';
 		}
