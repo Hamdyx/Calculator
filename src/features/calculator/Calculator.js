@@ -3,8 +3,7 @@ import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import Calc from './calc';
 
-import './Calculator.css';
-// @bug every component in Calculator re-renderes
+//! @bug every component in Calculator re-renderes
 // 	whenever a number is clicked or a key is pressed
 export const Calculator = () => {
 	/* const [n1, setN1] = useState('Hello'); */
