@@ -2,11 +2,9 @@ import React, { useEffect } from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 import Calc from './calc';
+import CalculatorBtn from './components/CalculatorBtn';
 
-//! @bug every component in Calculator re-renderes
-// 	whenever a number is clicked or a key is pressed
-export const Calculator = () => {
-	/* const [n1, setN1] = useState('Hello'); */
+export const Calculator: React.FC = () => {
 	const Calcx = new Calc();
 
 	const row0 = ['C', '%', 'x', '/'].map((el) => (
@@ -18,13 +16,12 @@ export const Calculator = () => {
 	const row4 = ['.', '='].map((el) => <CalculatorBtn key={el} val={el} />);
 
 	useEffect(() => {
-		// setup numberBtns eventListener
 		const setupEventListener = () => {
 			// handles when user press Numpad or Digits (0-9)
 			function handleKeyInput(ev: any) {
 				const operations = ['+', '-', '*', '/'];
 				if (ev.key !== ' ') {
-					if (!isNaN(ev.key) || ev.key === '.') appendNumber(ev.key);
+					if (!isNaN(Number(ev.key)) || ev.key === '.') appendNumber(ev.key);
 					else if (operations.includes(ev.key)) handleOperation(ev.key);
 					else {
 						switch (ev.key) {
@@ -89,13 +86,13 @@ export const Calculator = () => {
 			numberNode!.textContent = 'Hello';
 		}
 
-		function appendNumber(n: any) {
+		function appendNumber(n: string) {
 			console.log(`Number Entered: ${n}`);
 			let historyTxt: string = historyNode!.textContent || '';
 			if (historyTxt[historyTxt.length - 2] === '=') {
 				resetCalc();
 				numberNode!.textContent = n;
-				numberValue = n;
+				numberValue = parseFloat(n);
 				return;
 			}
 			// selects output screen
@@ -237,27 +234,5 @@ export const Calculator = () => {
 				{row4}
 			</Row>
 		</Container>
-	);
-};
-
-const CalculatorBtn: React.FC<{ val: string | number }> = ({ val }) => {
-	let _className;
-	if (isNaN(Number(val))) {
-		if (val === '=') {
-			_className = 'operationBtn equalsBtn';
-		} else if (val === '.') {
-			_className = 'numberBtn';
-		} else {
-			_className = 'operationBtn';
-		}
-	} else {
-		_className = 'numberBtn';
-	}
-	return (
-		<Col md={{ span: 3 }}>
-			<Button className={_className} value={val}>
-				{val}
-			</Button>
-		</Col>
 	);
 };
