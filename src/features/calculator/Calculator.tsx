@@ -21,7 +21,7 @@ export const Calculator = () => {
 		// setup numberBtns eventListener
 		const setupEventListener = () => {
 			// handles when user press Numpad or Digits (0-9)
-			function handleKeyInput(ev) {
+			function handleKeyInput(ev: any) {
 				const operations = ['+', '-', '*', '/'];
 				if (ev.key !== ' ') {
 					if (!isNaN(ev.key) || ev.key === '.') appendNumber(ev.key);
@@ -55,7 +55,7 @@ export const Calculator = () => {
 
 			numberBtns.forEach((btn) => {
 				// @bug eventListener added on every render
-				btn.addEventListener('click', (ev) => {
+				btn.addEventListener('click', (ev: any) => {
 					console.log(`numberBtn Clicked: ${ev.target.value}`);
 					appendNumber(ev.target.value);
 					// removes focus from clicked element as it causes a bug with the keydown ev
@@ -64,7 +64,7 @@ export const Calculator = () => {
 				});
 			});
 			operationsBtns.forEach((btn) => {
-				btn.addEventListener('click', (ev) => {
+				btn.addEventListener('click', (ev: any) => {
 					console.log(`operationsBtns Clicked: ${ev.target.value}`);
 					console.log(ev.target.value);
 					handleOperation(ev.target.value);
@@ -76,29 +76,30 @@ export const Calculator = () => {
 		};
 		setupEventListener();
 
-		const outputNode = document.querySelector('.output-row .col');
-		const historyNode = outputNode.childNodes[0];
-		const numberNode = outputNode.childNodes[1];
+		const outputNode: HTMLDivElement | null =
+			document.querySelector('.output-row .col');
+		const historyNode = outputNode?.childNodes[0];
+		const numberNode = outputNode?.childNodes[1];
 		let numberValue = 0;
 		let historyValue = 0;
 
 		function resetCalc() {
 			console.log('reset everything');
-			historyNode.textContent = 'prev number';
-			numberNode.textContent = 'Hello';
+			historyNode!.textContent = 'prev number';
+			numberNode!.textContent = 'Hello';
 		}
 
-		function appendNumber(n) {
+		function appendNumber(n: any) {
 			console.log(`Number Entered: ${n}`);
-			let historyTxt = historyNode.textContent;
+			let historyTxt: string = historyNode!.textContent || '';
 			if (historyTxt[historyTxt.length - 2] === '=') {
 				resetCalc();
-				numberNode.textContent = n;
+				numberNode!.textContent = n;
 				numberValue = n;
 				return;
 			}
 			// selects output screen
-			let currN = numberNode.textContent;
+			let currN = numberNode!.textContent;
 
 			/* if (n === '.' && currN.includes('.')) {
 				console.log('number already has DOT ( . )');
@@ -108,7 +109,7 @@ export const Calculator = () => {
 			// const node = document.querySelector(`button[value="${n}"]`);
 			let outNumber = currN === 'Hello' || currN === '0' ? '' : currN;
 			outNumber = outNumber + '' + n;
-			numberNode.textContent = outNumber;
+			numberNode!.textContent = outNumber;
 			numberValue = parseFloat(outNumber);
 			Calcx.setN1(parseFloat(outNumber));
 			Calcx.addInput(n);
@@ -117,12 +118,12 @@ export const Calculator = () => {
 		function enterPressed() {
 			console.log(`enterPressed`);
 			if (historyValue === 0) {
-				historyNode.textContent = `${parseFloat(numberNode.textContent)} = `;
+				historyNode!.textContent = `${parseFloat(numberNode!.textContent!)} = `;
 				return;
 			}
-			const op = historyNode.textContent.split(' ')[1];
-			historyNode.textContent += `${parseFloat(numberNode.textContent)} = `;
-			let res = 0;
+			const op = historyNode!.textContent!.split(' ')[1];
+			historyNode!.textContent += `${parseFloat(numberNode!.textContent!)} = `;
+			let res: number = 0;
 
 			switch (op) {
 				case '+':
@@ -153,19 +154,19 @@ export const Calculator = () => {
 			console.log(numberValue);
 			console.log('historyValue');
 			console.log(historyValue);
-			numberNode.textContent = res;
+			numberNode!.textContent = String(res);
 		}
 
-		function handleOperation(op) {
+		function handleOperation(op: string) {
 			console.log(`handleOperation`);
 			console.log(op);
-			historyValue = parseFloat(numberNode.textContent);
-			Calcx.setHistory(parseFloat(numberNode.textContent));
+			historyValue = parseFloat(numberNode!.textContent!);
+			Calcx.setHistory(parseFloat(numberNode!.textContent!));
 			Calcx.addInput(op);
 
 			/* historyNode.textContent += `${parseFloat(numberNode.textContent)} ${op} `; */
 			appendHistoryNode(op);
-			numberNode.textContent = '0'; // @bug if '' <p> disappears until N != ''
+			numberNode!.textContent = '0'; // @bug if '' <p> disappears until N != ''
 			switch (op) {
 				case '+':
 					console.log('addFunction(a, b)');
@@ -202,14 +203,14 @@ export const Calculator = () => {
 			}
 		}
 
-		function appendHistoryNode(op) {
-			if (historyNode.textContent === 'prev number') {
-				historyNode.textContent = `${parseFloat(
-					numberNode.textContent
+		function appendHistoryNode(op: string) {
+			if (historyNode!.textContent === 'prev number') {
+				historyNode!.textContent = `${parseFloat(
+					numberNode!.textContent!
 				)} ${op} `;
 			} else
-				historyNode.textContent += `${parseFloat(
-					numberNode.textContent
+				historyNode!.textContent += `${parseFloat(
+					numberNode!.textContent!
 				)} ${op} `;
 		}
 	});
@@ -239,9 +240,9 @@ export const Calculator = () => {
 	);
 };
 
-const CalculatorBtn = ({ val }) => {
+const CalculatorBtn: React.FC<{ val: string | number }> = ({ val }) => {
 	let _className;
-	if (isNaN(val)) {
+	if (isNaN(Number(val))) {
 		if (val === '=') {
 			_className = 'operationBtn equalsBtn';
 		} else if (val === '.') {
